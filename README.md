@@ -1,4 +1,4 @@
-# GroceryApp sprint2 
+# GroceryApp sprint2.
 
 ## Docentversie  
 In deze versie zijn de wijzigingen doorgevoerd en is de code compleet.  

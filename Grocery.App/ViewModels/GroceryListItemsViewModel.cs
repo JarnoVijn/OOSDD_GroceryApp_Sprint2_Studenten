@@ -1,4 +1,5 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
+﻿//using Android.Telecom;
+using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Grocery.App.Views;
 using Grocery.Core.Interfaces.Services;
@@ -35,9 +36,19 @@ namespace Grocery.App.ViewModels
         private void GetAvailableProducts()
         {
             //Maak de lijst AvailableProducts leeg
+            AvailableProducts.Clear();
             //Haal de lijst met producten op
+
             //Controleer of het product al op de boodschappenlijst staat, zo niet zet het in de AvailableProducts lijst
-            //Houdt rekening met de voorraad (als die nul is kun je het niet meer aanbieden).            
+            //Houdt rekening met de voorraad (als die nul is kun je het niet meer aanbieden).    
+            foreach (Product product in _productService.GetAll())
+            {
+                if (MyGroceryListItems.FirstOrDefault(i => i.Id == product.Id) == null && product.Stock > 0)
+                {
+                    AvailableProducts.Add(product);
+                }
+                
+            }
         }
 
         partial void OnGroceryListChanged(GroceryList value)
@@ -60,6 +71,16 @@ namespace Grocery.App.ViewModels
             //Werk de voorraad (Stock) van het product bij en zorg dat deze wordt vastgelegd (middels _productService)
             //Werk de lijst AvailableProducts bij, want dit product is niet meer beschikbaar
             //call OnGroceryListChanged(GroceryList);
+
+            if (product == null) return;
+            if (product.Id <= 0) return;
+            GroceryListItem list = new(0, GroceryList.Id, product.Id, 1);
+            _groceryListItemsService.Add(list);
+            product.Stock -= 1;
+            _productService.Update(product);
+
+            AvailableProducts.Remove(product);
+            OnGroceryListChanged(GroceryList);
         }
     }
 }
